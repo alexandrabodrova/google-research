@@ -131,11 +131,56 @@ class JumpyWorldNetwork(tf.keras.Model):
         padding='same',
         activation=activation_fn,
         name='Conv2')
+    # new conv layers for action encoder
+    self.conv01 = tf.keras.layers.Conv2D(
+        32, [8, 8],
+        strides=4,
+        padding='same',
+        activation=activation_fn,
+        name='Conv01')
+    self.conv11 = tf.keras.layers.Conv2D(
+        64, [4, 4],
+        strides=2,
+        padding='same',
+        activation=activation_fn,
+        name='Conv11')
+    self.conv21 = tf.keras.layers.Conv2D(
+        64, [3, 3],
+        strides=1,
+        padding='same',
+        activation=activation_fn,
+        name='Conv21')
+    self.conv02 = tf.keras.layers.Conv2D(
+        32, [8, 8],
+        strides=4,
+        padding='same',
+        activation=activation_fn,
+        name='Conv02')
+    self.conv12 = tf.keras.layers.Conv2D(
+        64, [4, 4],
+        strides=2,
+        padding='same',
+        activation=activation_fn,
+        name='Conv12')
+    self.conv22 = tf.keras.layers.Conv2D(
+        64, [3, 3],
+        strides=1,
+        padding='same',
+        activation=activation_fn,
+        name='Conv22')
     self.flatten = tf.keras.layers.Flatten()
     self.dense0 = tf.keras.layers.Dense(256, activation=activation_fn)
     self.dense1 = tf.keras.layers.Dense(64, activation=activation_fn)
     self.dense2 = tf.keras.layers.Dense(num_actions, name='fully_connected')
-
+    # new dense layers fr action encoder
+    self.dense01 = tf.keras.layers.Dense(256, activation=activation_fn)
+    self.dense11 = tf.keras.layers.Dense(64, activation=activation_fn)
+    self.dense21 = tf.keras.layers.Dense(num_actions, name='fully_connected')
+    # new dense layers for action decoder
+    self.dense02 = tf.keras.layers.Dense(256, activation=activation_fn)
+    self.dense12 = tf.keras.layers.Dense(64, activation=activation_fn)
+    self.dense22 = tf.keras.layers.Dense(num_actions, name='fully_connected')
+    
   @tf.function
   def call(self, state, training=True):
     """Creates the output tensor/op given the state tensor as input.
@@ -167,3 +212,38 @@ class JumpyWorldNetwork(tf.keras.Model):
     if projection and self._projection:
       x = self.dense1(x)
     return x
+
+  def action_representation(self, state, action):
+    """
+    Action encoder (state-dependent)
+    """
+    x = tf.cast(state, tf.float32)
+    if self.rand_conv is not None:
+      x = self.rand_conv(x)
+    x = self.conv01(x) # created different convolution layer names to avoid mixing up with state encoder
+    x = self.conv11(x)
+    x = self.conv21(x)
+    x = self.flatten(x)
+    x = self.dense01(x) # check dimensions 
+      # TODO
+      # concatinate state with action, run through a couple of linear layers 
+      # dimensionality - get to number of actions (dense layer) 
+      # ? add softmax - because actions are discrete 
+    return x   
+  def action_decoder(self, state, action_representation):
+    """
+    Action decoder (state-dependent)
+    """    
+    x = tf.cast(state, tf.float32)
+    if self.rand_conv is not None:
+      x = self.rand_conv(x)
+    x = self.conv02(x) # created different convolution layer names to avoid mixing up with action encoder
+    x = self.conv12(x)
+    x = self.conv22(x)
+    x = self.flatten(x) # action decoder - same as action encoder but with different weights
+    x = self.dense02(x) # check dimensions - same as encoded actions
+      # TODO
+      # concatinate state with action, run through a couple of linear layers 
+      # dimensionality - get to number of actions (dense layer) 
+      # ? add softmax - because actions are discrete     
+      

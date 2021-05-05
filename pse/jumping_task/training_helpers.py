@@ -149,6 +149,9 @@ def representation_alignment_loss(nn_model,
   """Representation alignment loss."""
   obs_1, actions_1, rewards_1 = optimal_data_tuple[0]
   obs_2, actions_2, rewards_2 = optimal_data_tuple[1]
+  
+  abstract_actions_1 = nn_model.action_representation(obs_1, actions_1)
+  abstract_actions_2 = nn_model.action_representation(obs_2, actions_2)
 
   representation_1 = nn_model.representation(obs_1)
   representation_2 = nn_model.representation(obs_2)

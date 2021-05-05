@@ -149,9 +149,9 @@ def train_step(nn_model,
   with tf.GradientTape() as tape:
     tape.watch(nn_model.trainable_variables)
     if not debugging:
-      # TODO - Sasha for 05/05
+
       # change here to accept abstract actions 
-      y_abstract =  model_helpers.action_representation(x, y)# run through action encoder - x, y = state, action?
+      y_abstract =  model_helpers.action_representation(x, y)# run through action encoder 
       cross_entropy_loss = training_helpers.cross_entropy_loss(
           nn_model, x, y_abstract, training=True)
       losses['cross_entropy_loss'] = cross_entropy_loss
@@ -163,14 +163,22 @@ def train_step(nn_model,
     # TODO
     # add action regularization - l1 regularization?
     # change representation alignment loss to abstract actions
-    
-    # TODO 
+    if l1_reg > 0: # loss 3 
+      # make a copy of abstract actions
+      # shuffle
+      # do pairwise distance (random) 
+      # compute l1 loss on it 
+      # weight = 10^-5 - 10^-2
+      # add to total loss
+      
     # action decoder training:
     # run y_abstract through decoder
     # add cross entropy loss on y 
-    y_decodeed = model_helpers.action_decoder(x, y_abstract)
-    losses['cross_entropy_loss'] = cross_entropy_loss
-    total_loss += cross_entropy_loss    
+    y_decoded = model_helpers.action_decoder(x, y_abstract)
+    action_decoder_cross_entropy_loss = training_helpers.cross_entropy_loss(
+          nn_model, y_decoded, y, training=True)
+    losses['action_decoder_loss'] = action_decoder_cross_entropy_loss
+    total_loss += action_decoder_cross_entropy_loss    
     
     if alpha > 0:
       alignment_loss, _, _ = training_helpers.representation_alignment_loss(

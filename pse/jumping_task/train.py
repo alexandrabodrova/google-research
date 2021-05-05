@@ -151,7 +151,7 @@ def train_step(nn_model,
     if not debugging:
 
       # change here to accept abstract actions 
-      y_abstract =  model_helpers.action_representation(x, y)# run through action encoder 
+      y_abstract =  nn_model.action_representation(x, y)# run through action encoder 
       cross_entropy_loss = training_helpers.cross_entropy_loss(
           nn_model, x, y_abstract, training=True)
       losses['cross_entropy_loss'] = cross_entropy_loss
@@ -174,7 +174,7 @@ def train_step(nn_model,
     # action decoder training:
     # run y_abstract through decoder
     # add cross entropy loss on y 
-    y_decoded = model_helpers.action_decoder(x, y_abstract)
+    y_decoded = nn_model.action_decoder(x, y_abstract)
     action_decoder_cross_entropy_loss = training_helpers.cross_entropy_loss(
           nn_model, y_decoded, y, training=True)
     losses['action_decoder_loss'] = action_decoder_cross_entropy_loss
@@ -182,7 +182,7 @@ def train_step(nn_model,
     
     if alpha > 0:
       alignment_loss, _, _ = training_helpers.representation_alignment_loss(
-          nn_model,
+          nn_model, 
           optimal_data_tuple=optimal_data_tuple,
           use_bisim=FLAGS.use_bisim,
           ground_truth=ground_truth_coupling,

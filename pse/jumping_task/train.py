@@ -149,9 +149,9 @@ def train_step(nn_model,
   with tf.GradientTape() as tape:
     tape.watch(nn_model.trainable_variables)
     if not debugging:
-      # TODO
+      # TODO - Sasha for 05/05
       # change here to accept abstract actions 
-      # y_abstract = run through acton encoder
+      y_abstract =  model_helpers.action_representation(x, y)# run through action encoder - x, y = state, action?
       cross_entropy_loss = training_helpers.cross_entropy_loss(
           nn_model, x, y_abstract, training=True)
       losses['cross_entropy_loss'] = cross_entropy_loss
@@ -161,8 +161,17 @@ def train_step(nn_model,
       losses['l2_regularization_loss'] = l2_regularization_loss
       total_loss += l2_reg * l2_regularization_loss
     # TODO
-    # add action regularization
+    # add action regularization - l1 regularization?
     # change representation alignment loss to abstract actions
+    
+    # TODO 
+    # action decoder training:
+    # run y_abstract through decoder
+    # add cross entropy loss on y 
+    y_decodeed = model_helpers.action_decoder(x, y_abstract)
+    losses['cross_entropy_loss'] = cross_entropy_loss
+    total_loss += cross_entropy_loss    
+    
     if alpha > 0:
       alignment_loss, _, _ = training_helpers.representation_alignment_loss(
           nn_model,

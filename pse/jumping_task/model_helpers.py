@@ -226,9 +226,13 @@ class JumpyWorldNetwork(tf.keras.Model):
     x = self.flatten(x)
     x = self.dense01(x) # check dimensions 
       # TODO
+      
+      # CHECK TF concatination function, dimensionallity = dimensionality of actions
       # concatinate state with action, run through a couple of linear layers 
+      
       # dimensionality - get to number of actions (dense layer) 
-      # ? add softmax - because actions are discrete 
+      
+      # softmax - probably in cross-entropy loss - CHECK
     return x   
   def action_decoder(self, state, action_representation):
     """
@@ -244,6 +248,5 @@ class JumpyWorldNetwork(tf.keras.Model):
     x = self.dense02(x) # check dimensions - same as encoded actions
       # TODO
       # concatinate state with action, run through a couple of linear layers 
-      # dimensionality - get to number of actions (dense layer) 
-      # ? add softmax - because actions are discrete     
+      # dimensionality - get to number of actions (dense layer)     
       
